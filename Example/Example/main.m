@@ -51,6 +51,7 @@ int main(int argc, char * argv[]) {
         read(fd, &magic_number, 4);
         printf("Mach-O Magic Number: %x \n", magic_number);
         close(fd);
+        
         // Setup code that might create autoreleased objects goes here.
         appDelegateClassName = NSStringFromClass([AppDelegate class]);
     }
