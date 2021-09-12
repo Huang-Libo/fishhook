@@ -4,7 +4,7 @@ __fishhook__ is a very simple library that enables **dynamically rebinding symbo
 
 At Facebook, we've found it useful as a way to hook calls in `libSystem` for **debugging / tracing purposes** (for example, auditing for double-close issues with file descriptors).
 
-[interpose]: http://opensource.apple.com/source/dyld/dyld-210.2.3/include/mach-o/dyld-interposing.h "<mach-o/dyld-interposing.h>"
+[interpose]: https://opensource.apple.com/source/dyld/dyld-852.2/include/mach-o/dyld-interposing.h.auto.html "<mach-o/dyld-interposing.h>"
 
 ## Usage
 
