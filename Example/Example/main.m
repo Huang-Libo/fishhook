@@ -37,7 +37,7 @@ int my_open(const char *path, int oflag, ...) {
 }
 
 int my_printf(const char * __restrict fmt, ...) {
-    char *extra = "[hook printf]";
+    char *extra = "[hook printf] ";
     char *result = malloc(strlen(fmt) + strlen(extra));
     strcpy(result, extra);
     strcat(result, fmt);
@@ -68,8 +68,8 @@ void rebindDemo2(void) {
         {"printf", my_printf, (void *)&orig_printf}
     };
     rebind_symbols(rebindings, 1);
-    int a = 24;
-    printf("rebindDemo2, %d", a);
+    int a = 666;
+    printf("After hook printf, %d\n", a);
 }
 
 int main(int argc, char * argv[]) {
