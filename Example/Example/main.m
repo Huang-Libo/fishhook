@@ -37,7 +37,7 @@ int my_open(const char *path, int oflag, ...) {
 }
 
 int my_printf(const char * __restrict fmt, ...) {
-    char *extra = "[hook printf] ";
+    char *extra = "🤯";
     char *result = malloc(strlen(fmt) + strlen(extra));
     strcpy(result, extra);
     strcat(result, fmt);
