@@ -34,7 +34,6 @@ void my_NSLog(NSString *format, ...) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
     
     NSLog(@"Before hook NSLog\n");
     // 调用 fishhook 来重新绑定 NSLog 对应的符号
@@ -44,6 +43,5 @@ void my_NSLog(NSString *format, ...) {
     rebind_symbols(rebindings, 1);
     NSLog(@"After hook NSLog\n");
 }
-
 
 @end
