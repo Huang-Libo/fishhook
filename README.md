@@ -85,7 +85,7 @@ Calling real close(3)
 
 `dyld` binds *lazy* and *non-lazy* symbols by **updating pointers in particular sections** of the `__DATA` segment of a Mach-O binary.
 
-__fishhook__ re-binds these symbols by **determining the locations to update** for each of the symbol names passed to `rebind_symbols` and then writing out the corresponding replacements.
+__fishhook__ re-binds these symbols by **determining the locations to update** for each of the symbol names passed to `rebind_symbols`(fishhhook's function) and then writing out the corresponding replacements.
 
 For a given image, the `__DATA` segment may contain two *sections* that are relevant for dynamic symbol bindings: `__nl_symbol_ptr` and `__la_symbol_ptr`.
 
