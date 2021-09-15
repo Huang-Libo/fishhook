@@ -1,5 +1,11 @@
 # fishhook
 
+## Fork 说明
+
+请参看：<https://huanglibo.gitbook.io/notebook/ios/fishhook>
+
+## Introduction
+
 __fishhook__ is a very simple library that enables **dynamically rebinding symbols in Mach-O** binaries running on iOS in the simulator and on device. This provides functionality that is similar to using [`DYLD_INTERPOSE`][interpose] on OS X.
 
 At Facebook, we've found it useful as a way to hook calls in `libSystem` for **debugging / tracing purposes** (for example, auditing for double-close issues with file descriptors).
@@ -58,7 +64,7 @@ int main(int argc, char * argv[]) {
         read(fd, &magic_number, 4);
         printf("Mach-O Magic Number: %x \n", magic_number);
         close(fd);
-        
+
         // Setup code that might create autoreleased objects goes here.
         appDelegateClassName = NSStringFromClass([AppDelegate class]);
     }
@@ -68,27 +74,12 @@ int main(int argc, char * argv[]) {
 
 ## Sample output
 
-### 32-bit
-
-```plaintext
-Calling real open('/var/mobile/Applications/161DA598-5B83-41F5-8A44-675491AF6A2C/Example.app/Example', 0)
-Mach-O Magic Number: feedface 
-Calling real close(3)
-...
-```
-
-( Mach-O Magic Number: **feedface** )
-
-### 64-bit
-
 ```plaintext
 Calling real open('/var/containers/Bundle/Application/8250D7D8-4893-486C-B5FC-FB55AA110116/Example.app/Example', 0)
 Mach-O Magic Number: feedfacf 
 Calling real close(3)
 ...
 ```
-
-( Mach-O Magic Number: **feedfacf** )
 
 ## How it works
 
