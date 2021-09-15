@@ -22,7 +22,7 @@ void my_NSLog(NSString *format, ...) {
         return;
     }
     // 在原始输出中添加额外的信息
-    NSString *extra = @"🤯";
+    NSString *extra = @"🤯 ";
     format = [extra stringByAppendingString:format];
     va_list args;
     va_start(args, format);
@@ -41,7 +41,8 @@ void my_NSLog(NSString *format, ...) {
         {"NSLog", my_NSLog, (void *)&orig_NSLog}
     };
     rebind_symbols(rebindings, 1);
-    NSLog(@"After hook NSLog\n");
+    NSInteger a = 888;
+    NSLog(@"After hook NSLog, %zd\n", a);
 }
 
 @end

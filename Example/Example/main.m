@@ -36,12 +36,18 @@ int my_open(const char *path, int oflag, ...) {
   }
 }
 
-int my_printf(const char * __restrict fmt, ...) {
-    char *extra = "🤯";
-    char *result = malloc(strlen(fmt) + strlen(extra));
-    strcpy(result, extra);
-    strcat(result, fmt);
-    return orig_printf(result);
+int my_printf(const char *format, ...)
+{
+    // 打印额外的前缀
+    orig_printf("🤯 ");
+    int retVal = 0;
+    // 取出变长参数
+    va_list args;
+    va_start(args, format);
+    retVal = vprintf(format, args);
+    va_end(args);
+
+    return retVal;
 }
 
 void rebindDemo1(int argc, char * argv[]) {
