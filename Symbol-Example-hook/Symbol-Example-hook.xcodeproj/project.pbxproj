@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		71818E0326F3243A009D3BFA /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 71818E0226F3243A009D3BFA /* main.c */; };
+		71818E1426F37000009D3BFA /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 71818E1326F37000009D3BFA /* main.c */; };
+		71FCA7BD26F3B8270096092E /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 71FCA7BB26F3B8270096092E /* fishhook.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		71818DF426F322FB009D3BFA /* CopyFiles */ = {
+		71818E0E26F37000009D3BFA /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -23,12 +24,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		71818DF626F322FB009D3BFA /* Symbol-Example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Symbol-Example"; sourceTree = BUILT_PRODUCTS_DIR; };
-		71818E0226F3243A009D3BFA /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		71818E1026F37000009D3BFA /* Symbol-Example-hook */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Symbol-Example-hook"; sourceTree = BUILT_PRODUCTS_DIR; };
+		71818E1326F37000009D3BFA /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		71FCA7BB26F3B8270096092E /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fishhook.c; path = ../../fishhook.c; sourceTree = "<group>"; };
+		71FCA7BC26F3B8270096092E /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fishhook.h; path = ../../fishhook.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		71818DF326F322FB009D3BFA /* Frameworks */ = {
+		71818E0D26F37000009D3BFA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -38,64 +41,66 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		71818DED26F322FA009D3BFA = {
+		71818E0726F37000009D3BFA = {
 			isa = PBXGroup;
 			children = (
-				71818DF826F322FB009D3BFA /* Symbol-Example */,
-				71818DF726F322FB009D3BFA /* Products */,
+				71818E1226F37000009D3BFA /* Symbol-Example-hook */,
+				71818E1126F37000009D3BFA /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		71818DF726F322FB009D3BFA /* Products */ = {
+		71818E1126F37000009D3BFA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				71818DF626F322FB009D3BFA /* Symbol-Example */,
+				71818E1026F37000009D3BFA /* Symbol-Example-hook */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		71818DF826F322FB009D3BFA /* Symbol-Example */ = {
+		71818E1226F37000009D3BFA /* Symbol-Example-hook */ = {
 			isa = PBXGroup;
 			children = (
-				71818E0226F3243A009D3BFA /* main.c */,
+				71FCA7BB26F3B8270096092E /* fishhook.c */,
+				71FCA7BC26F3B8270096092E /* fishhook.h */,
+				71818E1326F37000009D3BFA /* main.c */,
 			);
-			path = "Symbol-Example";
+			path = "Symbol-Example-hook";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		71818DF526F322FB009D3BFA /* Symbol-Example */ = {
+		71818E0F26F37000009D3BFA /* Symbol-Example-hook */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 71818DFD26F322FB009D3BFA /* Build configuration list for PBXNativeTarget "Symbol-Example" */;
+			buildConfigurationList = 71818E1726F37000009D3BFA /* Build configuration list for PBXNativeTarget "Symbol-Example-hook" */;
 			buildPhases = (
-				71818DF226F322FB009D3BFA /* Sources */,
-				71818DF326F322FB009D3BFA /* Frameworks */,
-				71818DF426F322FB009D3BFA /* CopyFiles */,
+				71818E0C26F37000009D3BFA /* Sources */,
+				71818E0D26F37000009D3BFA /* Frameworks */,
+				71818E0E26F37000009D3BFA /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "Symbol-Example";
-			productName = "Symbol-Example";
-			productReference = 71818DF626F322FB009D3BFA /* Symbol-Example */;
+			name = "Symbol-Example-hook";
+			productName = "Symbol-Example-hook";
+			productReference = 71818E1026F37000009D3BFA /* Symbol-Example-hook */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		71818DEE26F322FA009D3BFA /* Project object */ = {
+		71818E0826F37000009D3BFA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1250;
 				TargetAttributes = {
-					71818DF526F322FB009D3BFA = {
+					71818E0F26F37000009D3BFA = {
 						CreatedOnToolsVersion = 12.5;
 					};
 				};
 			};
-			buildConfigurationList = 71818DF126F322FA009D3BFA /* Build configuration list for PBXProject "Symbol-Example" */;
+			buildConfigurationList = 71818E0B26F37000009D3BFA /* Build configuration list for PBXProject "Symbol-Example-hook" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -103,29 +108,30 @@
 				en,
 				Base,
 			);
-			mainGroup = 71818DED26F322FA009D3BFA;
-			productRefGroup = 71818DF726F322FB009D3BFA /* Products */;
+			mainGroup = 71818E0726F37000009D3BFA;
+			productRefGroup = 71818E1126F37000009D3BFA /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				71818DF526F322FB009D3BFA /* Symbol-Example */,
+				71818E0F26F37000009D3BFA /* Symbol-Example-hook */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		71818DF226F322FB009D3BFA /* Sources */ = {
+		71818E0C26F37000009D3BFA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71818E0326F3243A009D3BFA /* main.c in Sources */,
+				71FCA7BD26F3B8270096092E /* fishhook.c in Sources */,
+				71818E1426F37000009D3BFA /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		71818DFB26F322FB009D3BFA /* Debug */ = {
+		71818E1526F37000009D3BFA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -184,7 +190,7 @@
 			};
 			name = Debug;
 		};
-		71818DFC26F322FB009D3BFA /* Release */ = {
+		71818E1626F37000009D3BFA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -236,7 +242,7 @@
 			};
 			name = Release;
 		};
-		71818DFE26F322FB009D3BFA /* Debug */ = {
+		71818E1826F37000009D3BFA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -244,7 +250,7 @@
 			};
 			name = Debug;
 		};
-		71818DFF26F322FB009D3BFA /* Release */ = {
+		71818E1926F37000009D3BFA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -255,25 +261,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		71818DF126F322FA009D3BFA /* Build configuration list for PBXProject "Symbol-Example" */ = {
+		71818E0B26F37000009D3BFA /* Build configuration list for PBXProject "Symbol-Example-hook" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				71818DFB26F322FB009D3BFA /* Debug */,
-				71818DFC26F322FB009D3BFA /* Release */,
+				71818E1526F37000009D3BFA /* Debug */,
+				71818E1626F37000009D3BFA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		71818DFD26F322FB009D3BFA /* Build configuration list for PBXNativeTarget "Symbol-Example" */ = {
+		71818E1726F37000009D3BFA /* Build configuration list for PBXNativeTarget "Symbol-Example-hook" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				71818DFE26F322FB009D3BFA /* Debug */,
-				71818DFF26F322FB009D3BFA /* Release */,
+				71818E1826F37000009D3BFA /* Debug */,
+				71818E1926F37000009D3BFA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 71818DEE26F322FA009D3BFA /* Project object */;
+	rootObject = 71818E0826F37000009D3BFA /* Project object */;
 }
