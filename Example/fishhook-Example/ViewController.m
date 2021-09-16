@@ -41,8 +41,9 @@ void my_NSLog(NSString *format, ...) {
         {"NSLog", my_NSLog, (void *)&orig_NSLog}
     };
     rebind_symbols(rebindings, 1);
-    NSInteger a = 888;
-    NSLog(@"After hook NSLog, %zd\n", a);
+    NSInteger num = 888;
+    NSString *str = @"String!";
+    NSLog(@"After hook NSLog, %zd, %@\n", num, str);
 }
 
 @end

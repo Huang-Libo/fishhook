@@ -74,8 +74,9 @@ void rebindDemo2(void) {
         {"printf", my_printf, (void *)&orig_printf}
     };
     rebind_symbols(rebindings, 1);
-    int a = 666;
-    printf("After hook printf, %d\n", a);
+    int num = 666;
+    char * cStr = "c string!";
+    printf("After hook printf, %d, %s\n", num, cStr);
 }
 
 int main(int argc, char * argv[]) {
