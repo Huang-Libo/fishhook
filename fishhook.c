@@ -1,28 +1,4 @@
-// Copyright (c) 2013, Facebook, Inc.
-// All rights reserved.
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//   * Redistributions of source code must retain the above copyright notice,
-//     this list of conditions and the following disclaimer.
-//   * Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation
-//     and/or other materials provided with the distribution.
-//   * Neither the name Facebook nor the names of its contributors may be used to
-//     endorse or promote products derived from this software without specific
-//     prior written permission.
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #include "fishhook.h"
-
 #include <dlfcn.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -79,52 +55,24 @@ static int prepend_rebindings(struct rebindings_entry **rebindings_head,
   // 构建新的 struct rebinding 数组
   new_entry->rebindings = (struct rebinding *) malloc(sizeof(struct rebinding) * nel);
   if (!new_entry->rebindings) {
-  free(new_entry);
-      return -1;
+    free(new_entry);
+    return -1;
   }
   // struct rebinding 数组
   memcpy(new_entry->rebindings, rebindings, sizeof(struct rebinding) * nel);
   new_entry->rebindings_nel = nel;
   // 新的节点放在链表的前面
   new_entry->next = *rebindings_head;
-  // 更新头结点
+  // 头结点指向新加入的节点
   *rebindings_head = new_entry;
   return 0;
 }
 
-#if 0
-static int get_protection(void *addr, vm_prot_t *prot, vm_prot_t *max_prot) {
-  mach_port_t task = mach_task_self();
-  vm_size_t size = 0;
-  vm_address_t address = (vm_address_t)addr;
-  memory_object_name_t object;
-#ifdef __LP64__
-  mach_msg_type_number_t count = VM_REGION_BASIC_INFO_COUNT_64;
-  vm_region_basic_info_data_64_t info;
-  kern_return_t info_ret = vm_region_64(
-      task, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_64_t)&info, &count, &object);
-#else
-  mach_msg_type_number_t count = VM_REGION_BASIC_INFO_COUNT;
-  vm_region_basic_info_data_t info;
-  kern_return_t info_ret = vm_region(task, &address, &size, VM_REGION_BASIC_INFO, (vm_region_info_t)&info, &count, &object);
-#endif
-  if (info_ret == KERN_SUCCESS) {
-    if (prot != NULL)
-      *prot = info.protection;
-
-    if (max_prot != NULL)
-      *max_prot = info.max_protection;
-
-    return 0;
-  }
-
-  return -1;
-}
-#endif
-
 /// 最终执行重绑定的函数
 /// @param rebindings 单链表的头结点
-/// @param section 符号所在的 section
+/// @param section load command 中的类型为
+///                S_NON_LAZY_SYMBOL_POINTERS 或 S_NON_LAZY_SYMBOL_POINTERS
+///                的 section
 /// @param slide 偏移量
 /// @param symtab `符号表`的地址
 /// @param strtab `字符串表`的地址
@@ -136,7 +84,8 @@ static void perform_rebinding_with_section(struct rebindings_entry *rebindings,
                                            char *strtab,
                                            uint32_t *indirect_symtab) {
   // 解读: load command 的 Section64 Header (类型是 struct section_64 ) 的
-  //      reserved1 字段表示 symbol 在 indirect_symtab 中的偏移量
+  //      reserved1 字段表示:
+  //      lazy symbol pointer 或 non-lazy symbol pointer 在 indirect_symtab 中的索引
   // 获取 symbol 的地址, 这个地址上默认是 `dyld_stub_binder` 符号
   uint32_t *indirect_symbol_indices = indirect_symtab + section->reserved1;
   // section->addr 表示当前 load command Section64 Header 对应的 __DATA 段的 section 的地址
@@ -221,7 +170,8 @@ static void perform_rebinding_with_section(struct rebindings_entry *rebindings,
   }
 }
 
-/// 执行符号重绑定的核心方法
+/// 核心方法: 查找符号表 / 字符串表 / __la_symbol_ptr 的 load command ,
+///          从而获取到它们的基地址
 /// @param rebindings 单链表的头结点
 /// @param header 需要执行符号重绑定的 image 的 mach-o header
 /// @param slide 指定 image 的偏移量
@@ -230,7 +180,7 @@ static void rebind_symbols_for_image(struct rebindings_entry *rebindings,
                                      intptr_t slide) {
   // Structure filled in by dladdr().
   Dl_info info;
-  if (dladdr(header, &info) == 0) {
+  if (dladdr(header, &info) == 0) { // 过滤不符合条件的情况(具体的含义是?)
     return;
   }
 
@@ -248,21 +198,27 @@ static void rebind_symbols_for_image(struct rebindings_entry *rebindings,
   // 循环的任务: 在 load command 中查找 linkedit_segment , symtab_cmd , dysymtab_cmd
   for (uint i = 0; i < header->ncmds; i++, cur += cur_seg_cmd->cmdsize) {
     cur_seg_cmd = (segment_command_t *)cur;
-    if (cur_seg_cmd->cmd == LC_SEGMENT_ARCH_DEPENDENT) { // 问题: 这个判断是干啥的?
+    // 判断当前 command 的类型是否是 load command
+    // 1.当前 load command 是: LC_SEGMENT 或 LC_SEGMENT_64
+    if (cur_seg_cmd->cmd == LC_SEGMENT_ARCH_DEPENDENT) {
+      // segname 的名称是否是 "__LINKEDIT"
       if (strcmp(cur_seg_cmd->segname, SEG_LINKEDIT) == 0) {
-        //
         linkedit_segment = cur_seg_cmd;
       }
-    } else if (cur_seg_cmd->cmd == LC_SYMTAB) {
-      //
+    }
+    // 2. 当前 load command 是: link-edit stab symbol table info
+    else if (cur_seg_cmd->cmd == LC_SYMTAB)
+    {
       symtab_cmd = (struct symtab_command*)cur_seg_cmd;
-    } else if (cur_seg_cmd->cmd == LC_DYSYMTAB) {
-      //
+    }
+    // 3. 当前 load command 是: dynamic link-edit symbol table info
+    else if (cur_seg_cmd->cmd == LC_DYSYMTAB)
+    {
       dysymtab_cmd = (struct dysymtab_command*)cur_seg_cmd;
     }
   }
 
-  // nindirectsyms: number of indirect symbol table entries
+  // 文档, `nindirectsyms`: number of indirect symbol table entries
   if (!symtab_cmd || !dysymtab_cmd || !linkedit_segment ||
       !dysymtab_cmd->nindirectsyms) {
     // 不符合符号重绑定的条件
@@ -271,6 +227,7 @@ static void rebind_symbols_for_image(struct rebindings_entry *rebindings,
 
   // Find base symbol/string table addresses
   // 使用 load command 中的信息来计算出相应的 segment 或 section 的地址
+  // 疑问❓: 问什么要减 `fileoff`
   // 1. __LINKEDIT segment 的基地址
   uintptr_t linkedit_base = (uintptr_t)slide + linkedit_segment->vmaddr - linkedit_segment->fileoff;
   // 2. Symbol Table 的地址
@@ -327,7 +284,8 @@ int rebind_symbols_image(void *header,
   // 构建单链表
   int retval = prepend_rebindings(&rebindings_head, rebindings, rebindings_nel);
   rebind_symbols_for_image(rebindings_head, (const struct mach_header *) header, slide);
-  // 重绑定完成后, 销毁头结点及其中的元素 (rebind_symbols_image 这个方法只对指定的 mach-o 执行重绑定, 因此用完之后要销毁)
+  // 重绑定完成后, 销毁头结点及其中的元素
+  // (rebind_symbols_image 这个方法只对指定的 mach-o 执行重绑定, 因此用完之后要销毁)
   if (rebindings_head) {
     free(rebindings_head->rebindings);
   }
@@ -337,25 +295,29 @@ int rebind_symbols_image(void *header,
 
 // 这个函数最终会调用 `rebind_symbols_for_image()` 函数
 int rebind_symbols(struct rebinding rebindings[], size_t rebindings_nel) {
-  // 调用 prepend_rebindings() 来构建单链表, 如果是第一次调用 `rebind_symbols` , 则构建的单链表中只有一个节点
+  // 调用 `prepend_rebindings()` 来构建单链表,
+  // 如果是第一次调用 `rebind_symbols()` , 则构建的单链表中只有一个节点
   int retval = prepend_rebindings(&_rebindings_head, rebindings, rebindings_nel);
   if (retval < 0) {
     return retval;
   }
-  // If this was the first call, register callback for image additions (which is also invoked for
-  // existing images, otherwise, just run on existing images
+  // If this was the first call, register callback for image additions
+  // (which is also invoked for existing images,
+  //  otherwise, just run on existing images)
   if (!_rebindings_head->next) {
     // 1. 单链表中只有一个节点时, 说明是第一次调用 `rebind_symbols()` ,
     //    因此需要调用 `_dyld_register_func_for_add_image()` 注册回调函数
-    // 文档: During a call to `_dyld_register_func_for_add_image()` the callback func
-    //      is called for every existing image. Later, it is called as each new image
-    //      is loaded and bound
-    // 解读: 在调用 `_dyld_register_func_for_add_image()` 期间，会为每个现有的 image 调用回调函数。
+    // 文档: During a call to `_dyld_register_func_for_add_image()` ,
+    //      the callback func is called for every existing image.
+    //      Later, it is called as each new image is loaded and bound
+    // 解读: 在调用 `_dyld_register_func_for_add_image()` 期间，
+    //      会为每个现有的 image 调用回调函数。
     //      此后, 在加载和绑定每个新 image 时调用该回调函数.
     // 问题: dyld 怎么给这个回调函数传参的?
     _dyld_register_func_for_add_image(_rebind_symbols_for_image);
   } else {
-    // 2. 单链表中有多个元素, 说明不是第一次调用 `rebind_symbols()` , 此时需要对以加载的 image 执行重绑定
+    // 2. 单链表中有多个元素, 说明不是第一次调用 `rebind_symbols()` ,
+    //    此时需要对已加载的 image 执行符号的重绑定
     uint32_t c = _dyld_image_count();
     for (uint32_t i = 0; i < c; i++) {
       _rebind_symbols_for_image(_dyld_get_image_header(i), _dyld_get_image_vmaddr_slide(i));
